@@ -1,0 +1,56 @@
+BACKUP ~blondeimmy/backup~
+SUPPORT ~https://www.gibberlings3.net/forums/forum/28-miscellaneous-released-mods/~
+
+//MODDER
+
+VERSION ~v6~
+
+ALWAYS
+
+  ACTION_IF NOT VARIABLE_IS_SET cd_always THEN BEGIN // check to make this happen only once per install
+    
+	OUTER_SET cd_always = 1
+	INCLUDE ~blondeimmy/lib/cd_portrait_copy.tph~
+  
+  END
+
+END
+
+README ~blondeimmy/readme-blondeimmy.html~
+
+LANGUAGE ~English~ ~english~ ~blondeimmy/english/setup.tra~
+
+BEGIN @2
+SUBCOMPONENT @0
+REQUIRE_PREDICATE GAME_IS ~bg2 tob bg2ee eet bgt~ @1
+
+LAF cd_portrait_copy STR_VAR source = "nimoen1" destination = "nimoen" source_path = "blondeimmy/portraits" END 
+
+COPY_EXISTING_REGEXP GLOB ~^.+\.cre$~ ~override~ // Imoen animation adjustments
+  READ_LONG   0x08 name  ELSE 0
+  READ_BYTE  0x273 class ELSE 0
+  PATCH_IF (((name = 16453) OR (name = 16454)) AND (class = 13) ) BEGIN // check class so that we skip BG Imoen for EET/BGT installs
+    WRITE_BYTE 0x32 0x03 // hair color to light gold
+  END
+  BUT_ONLY
+
+BEGIN @3
+SUBCOMPONENT @0
+REQUIRE_PREDICATE GAME_IS ~bg2 tob bg2ee eet bgt~ @1
+
+LAF cd_portrait_copy STR_VAR source = "nimoen2" destination = "nimoen" source_path = "blondeimmy/portraits" END 
+
+COPY_EXISTING_REGEXP GLOB ~^.+\.cre$~ ~override~ // Imoen animation adjustments
+  READ_LONG   0x08 name  ELSE 0
+  READ_BYTE  0x273 class ELSE 0
+  PATCH_IF (((name = 16453) OR (name = 16454)) AND (class = 13) ) BEGIN // check class so that we skip BG Imoen for EET/BGT installs
+	WRITE_SHORT 0x28 0x6211 // animation to mage_female_elf
+    WRITE_BYTE  0x32 0x03   // hair color to light gold
+  END
+  BUT_ONLY
+
+  
+BEGIN @4
+						
+LAF cd_pc_portrait_copy STR_VAR source = nimoen1 source_path = "blondeimmy/portraits" END
+LAF cd_pc_portrait_copy STR_VAR source = nimoen2 source_path = "blondeimmy/portraits" END
